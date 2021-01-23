@@ -42,13 +42,13 @@ let (/) v w =
   ; z = v.z /. w.z
   }
 
-let muls v f =
-  { x = v.x *. f
-  ; y = v.y *. f
-  ; z = v.z *. f
+let ( *. ) f v =
+  { x = f *. v.x
+  ; y = f *. v.y
+  ; z = f *. v.z
   }
 
-let divs v f =
+let ( /. ) v f =
   { x = v.x /. f
   ; y = v.y /. f
   ; z = v.z /. f
@@ -74,4 +74,4 @@ let cross v w =
   }
 
 let unit v =
-  divs v (length v)
+  v /. length v

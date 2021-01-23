@@ -11,8 +11,8 @@ val (+) : t -> t -> t
 val (-) : t -> t -> t
 val ( * ) : t -> t -> t
 val (/) : t -> t -> t
-val muls : t -> float -> t
-val divs : t -> float -> t
+val ( *. ) : float -> t -> t
+val (/.) : t -> float -> t
 
 val length : t -> float
 val squared_length : t -> float
