@@ -39,18 +39,25 @@ let hit_sphere center radius ray =
   let open Vec3 in
   let oc = ray.origin - center in
   let a = dot ray.direction ray.direction in
-  let b = Float.O.(2.0 * dot oc ray.direction) in
-  let c = Float.O.(dot oc oc - radius*radius) in
-  let discriminant = Float.O.(b*b - 4.0*a*c) in
-  Float.O.(discriminant > 0.0)
+  let open Float.O in
+  let b = 2.0 * dot oc ray.direction in
+  let c = dot oc oc - radius*radius in
+  let discriminant = b*b - 4.0*a*c in
+  if discriminant < 0.0 then
+    None
+  else
+    let t = (-b - Float.sqrt discriminant) / (2.0*a) in
+    Some (point_at_parameter ray t)
 
 let color_of ray =
-  if hit_sphere (Vec3.make 0.0 0.0 (-1.0)) 0.5 ray then
-    Vec3.make 1.0 0.0 0.0
-  else
-    let unit_direction = Vec3.unit ray.Ray.direction in
-    let t = unit_direction.Vec3.y +. 1.0 in
-    lerp (Vec3.make 1.0 1.0 1.0) (Vec3.make 0.5 0.7 1.0) t
+  match hit_sphere (Vec3.make 0.0 0.0 (-1.0)) 0.5 ray with
+  | Some p ->
+      let n = Vec3.(unit (p - make 0.0 0.0 (-1.0))) in
+      Vec3.(0.5 *. (n + make 1.0 1.0 1.0))
+  | None ->
+      let unit_direction = Vec3.unit ray.Ray.direction in
+      let t = unit_direction.Vec3.y +. 1.0 in
+      lerp (Vec3.make 1.0 1.0 1.0) (Vec3.make 0.5 0.7 1.0) t
 
 let () =
   let origin            = Vec3.make   0.0    0.0    0.0  in
