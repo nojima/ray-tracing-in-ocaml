@@ -1,5 +1,5 @@
 SOURCES = $(wildcard *.ml) $(wildcard *.mli)
-EXE = ./_build/default/ch01_output_ppm.exe
+EXE = ./_build/default/raytrace.exe
 
 img.ppm: $(EXE)
 	$(EXE) > img.ppm
