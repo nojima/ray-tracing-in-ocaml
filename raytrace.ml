@@ -43,7 +43,7 @@ let rec cast_ray ray world depth =
   | None ->
       let open Vec3 in
       let unit_direction = unit ray.direction in
-      let t = unit_direction.y +. 1.0 in
+      let t = Float.O.(0.5 * (unit_direction.y + 1.0)) in
       lerp (make 1.0 1.0 1.0) (make 0.5 0.7 1.0) t
 
 let sample_color camera world x y nx ny =
@@ -73,8 +73,8 @@ let () =
   let world = Hitable.Collection
     [ Hitable.Sphere (Vec3.make   0.0      0.0  (-1.0),   0.5, Material.Lambertian (Vec3.make 0.8 0.3 0.3))
     ; Hitable.Sphere (Vec3.make   0.0  (-100.5) (-1.0), 100.0, Material.Lambertian (Vec3.make 0.8 0.8 0.0))
-    ; Hitable.Sphere (Vec3.make   1.0      0.0  (-1.0),   0.5, Material.Metal (Vec3.make 0.8 0.6 0.2))
-    ; Hitable.Sphere (Vec3.make (-1.0)     0.0  (-1.0),   0.5, Material.Metal (Vec3.make 0.8 0.8 0.8))
+    ; Hitable.Sphere (Vec3.make   1.0      0.0  (-1.0),   0.5, Material.Metal (Vec3.make 0.8 0.6 0.2, 1.0))
+    ; Hitable.Sphere (Vec3.make (-1.0)     0.0  (-1.0),   0.5, Material.Metal (Vec3.make 0.8 0.8 0.8, 0.3))
     ]
   in
   PPM.write nx ny (fun x y ->
