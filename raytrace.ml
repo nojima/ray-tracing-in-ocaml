@@ -29,14 +29,28 @@ end = struct
 
 end
 
-let cast_ray ray world =
-  match Hitable.hit world ray 0.0 Float.max_finite_value with
-  | Some { normal; _ } ->
-      Vec3.(0.5 *. (normal + make 1.0 1.0 1.0))
+let rec random_in_unit_sphere () =
+  let x = Random.float_range (-1.0) 1.0 in
+  let y = Random.float_range (-1.0) 1.0 in
+  let z = Random.float_range (-1.0) 1.0 in
+  let open Float.O in
+  if x*x + y*y + z*z < 1.0 then
+    Vec3.make x y z
+  else
+    random_in_unit_sphere ()
+
+let rec cast_ray ray world =
+  match Hitable.hit world ray 0.001 Float.max_finite_value with
+  | Some { p; normal; _ } ->
+      let open Vec3 in
+      let target = p + normal + random_in_unit_sphere () in
+      let new_ray : Ray.t = { origin = p; direction = target - p } in
+      0.5 *. cast_ray new_ray world
   | None ->
-      let unit_direction = Vec3.unit ray.Ray.direction in
-      let t = unit_direction.Vec3.y +. 1.0 in
-      Vec3.lerp (Vec3.make 1.0 1.0 1.0) (Vec3.make 0.5 0.7 1.0) t
+      let open Vec3 in
+      let unit_direction = unit ray.direction in
+      let t = unit_direction.y +. 1.0 in
+      lerp (make 1.0 1.0 1.0) (make 0.5 0.7 1.0) t
 
 let sample_color camera world x y nx ny =
   let open Float.O in
@@ -54,6 +68,10 @@ let sample_colors camera world x y nx ny n_samples =
   in
   go n_samples Vec3.zero
 
+let gamma_correction c =
+  let open Vec3 in
+  make (Float.sqrt c.x) (Float.sqrt c.y) (Float.sqrt c.z)
+
 let () =
   let (nx, ny) = (200, 100) in
   let n_samples = 100 in
@@ -64,5 +82,6 @@ let () =
     ]
   in
   PPM.write nx ny (fun x y ->
-    Vec3.(sample_colors camera world x y nx ny n_samples /. Float.of_int n_samples)
+    let c = Vec3.(sample_colors camera world x y nx ny n_samples /. Float.of_int n_samples) in
+    gamma_correction c
   )
