@@ -66,7 +66,7 @@ let sample_colors camera world x y nx ny n_samples =
     else
       go (n_samples-1) Vec3.(acc + sample_color camera world x y nx ny)
   in
-  go n_samples Vec3.zero
+  Vec3.(go n_samples zero /. Float.of_int n_samples)
 
 let gamma_correction c =
   let open Vec3 in
@@ -82,6 +82,6 @@ let () =
     ]
   in
   PPM.write nx ny (fun x y ->
-    let c = Vec3.(sample_colors camera world x y nx ny n_samples /. Float.of_int n_samples) in
+    let c = sample_colors camera world x y nx ny n_samples in
     gamma_correction c
   )
