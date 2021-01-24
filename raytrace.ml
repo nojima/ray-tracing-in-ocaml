@@ -29,23 +29,17 @@ end = struct
 
 end
 
-let rec random_in_unit_sphere () =
-  let x = Random.float_range (-1.0) 1.0 in
-  let y = Random.float_range (-1.0) 1.0 in
-  let z = Random.float_range (-1.0) 1.0 in
-  let open Float.O in
-  if x*x + y*y + z*z < 1.0 then
-    Vec3.make x y z
-  else
-    random_in_unit_sphere ()
-
-let rec cast_ray ray world =
+let rec cast_ray ray world depth =
   match Hitable.hit world ray 0.001 Float.max_finite_value with
-  | Some { p; normal; _ } ->
-      let open Vec3 in
-      let target = p + normal + random_in_unit_sphere () in
-      let new_ray : Ray.t = { origin = p; direction = target - p } in
-      0.5 *. cast_ray new_ray world
+  | Some { p; normal; material; _ } ->
+      if depth < 50 then
+        match Material.scatter material ray p normal with
+        | Some { ray; attenuation } ->
+            Vec3.(attenuation * cast_ray ray world Int.(depth+1))
+        | None ->
+            Vec3.zero
+      else
+        Vec3.zero
   | None ->
       let open Vec3 in
       let unit_direction = unit ray.direction in
@@ -57,7 +51,7 @@ let sample_color camera world x y nx ny =
   let u = (Float.of_int x + Random.float 1.0) / Float.of_int nx in
   let v = (Float.of_int y + Random.float 1.0) / Float.of_int ny in
   let ray = Camera.get_ray camera u v in
-  cast_ray ray world
+  cast_ray ray world 0
 
 let sample_colors camera world x y nx ny n_samples =
   let rec go n_samples acc =
@@ -77,11 +71,13 @@ let () =
   let n_samples = 100 in
   let camera = Camera.make () in
   let world = Hitable.Collection
-    [ Hitable.Sphere (Vec3.make 0.0     0.0  (-1.0),   0.5)
-    ; Hitable.Sphere (Vec3.make 0.0 (-100.5) (-1.0), 100.0)
+    [ Hitable.Sphere (Vec3.make   0.0      0.0  (-1.0),   0.5, Material.Lambertian (Vec3.make 0.8 0.3 0.3))
+    ; Hitable.Sphere (Vec3.make   0.0  (-100.5) (-1.0), 100.0, Material.Lambertian (Vec3.make 0.8 0.8 0.0))
+    ; Hitable.Sphere (Vec3.make   1.0      0.0  (-1.0),   0.5, Material.Metal (Vec3.make 0.8 0.6 0.2))
+    ; Hitable.Sphere (Vec3.make (-1.0)     0.0  (-1.0),   0.5, Material.Metal (Vec3.make 0.8 0.8 0.8))
     ]
   in
   PPM.write nx ny (fun x y ->
-    let c = sample_colors camera world x y nx ny n_samples in
-    gamma_correction c
+    sample_colors camera world x y nx ny n_samples
+    |> gamma_correction
   )

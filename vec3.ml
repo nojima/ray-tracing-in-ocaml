@@ -81,3 +81,6 @@ let zero =
 
 let lerp a b t =
   (1.0 -. t) *. a + t *. b
+
+let reflect v n =
+  v - 2.0 *. (dot v n *. n)

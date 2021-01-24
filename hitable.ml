@@ -1,23 +1,24 @@
 open Base
 
 type t =
-  | Sphere of Vec3.t * float
+  | Sphere of Vec3.t * float * Material.t
   | Collection of t list
 
 type record =
   { t : float
   ; p : Vec3.t
   ; normal : Vec3.t
+  ; material : Material.t
   }
 
 let rec hit (hitable : t) (ray : Ray.t) (t_min : float) (t_max : float) : record option =
   match hitable with
-  | Sphere (center, radius) ->
-      hit_sphere center radius ray t_min t_max
+  | Sphere (center, radius, material) ->
+      hit_sphere center radius material ray t_min t_max
   | Collection hitables ->
       hit_collection hitables ray t_min t_max
 
-and hit_sphere center radius ray t_min t_max =
+and hit_sphere center radius material ray t_min t_max =
   let open Ray in
   let open Vec3 in
   let oc = ray.origin - center in
@@ -33,13 +34,13 @@ and hit_sphere center radius ray t_min t_max =
     if t_min < t && t < t_max then
       let p = point_at_parameter ray t in
       let normal = Vec3.((p - center) /. radius) in
-      Some { t; p; normal }
+      Some { t; p; normal; material }
     else
       let t = (-b + Float.sqrt discriminant) / a in
       if t_min < t && t < t_max then
         let p = point_at_parameter ray t in
         let normal = Vec3.((p - center) /. radius) in
-        Some { t; p; normal }
+        Some { t; p; normal; material }
       else
         None
 

@@ -21,3 +21,4 @@ val cross : t -> t -> t
 val unit : t -> t
 val zero : t
 val lerp : t -> t -> float -> t
+val reflect : t -> t -> t
