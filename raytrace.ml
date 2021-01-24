@@ -1,5 +1,11 @@
 open Base
 
+let background ray =
+  let open Vec3 in
+  let unit_direction = unit ray.Ray.direction in
+  let t = Float.O.(0.5 * (unit_direction.y + 1.0)) in
+  lerp (make 1.0 1.0 1.0) (make 0.5 0.7 1.0) t
+
 let rec cast_ray ray world depth =
   match Hitable.hit world ray 0.001 Float.max_finite_value with
   | Some { p; normal; material; _ } ->
@@ -12,10 +18,7 @@ let rec cast_ray ray world depth =
       else
         Vec3.zero
   | None ->
-      let open Vec3 in
-      let unit_direction = unit ray.direction in
-      let t = Float.O.(0.5 * (unit_direction.y + 1.0)) in
-      lerp (make 1.0 1.0 1.0) (make 0.5 0.7 1.0) t
+      background ray
 
 let sample_color camera world x y nx ny =
   let open Float.O in
@@ -34,8 +37,7 @@ let sample_colors camera world x y nx ny n_samples =
   Vec3.(go n_samples zero /. Float.of_int n_samples)
 
 let gamma_correction c =
-  let open Vec3 in
-  make (Float.sqrt c.x) (Float.sqrt c.y) (Float.sqrt c.z)
+  Vec3.(make (Float.sqrt c.x) (Float.sqrt c.y) (Float.sqrt c.z))
 
 let () =
   let (nx, ny) = (200, 100) in
