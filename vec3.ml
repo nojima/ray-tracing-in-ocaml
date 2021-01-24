@@ -78,3 +78,6 @@ let unit v =
 
 let zero =
   make 0.0 0.0 0.0
+
+let lerp a b t =
+  (1.0 -. t) *. a + t *. b

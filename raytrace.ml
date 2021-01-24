@@ -29,9 +29,6 @@ end = struct
 
 end
 
-let lerp a b t =
-  Vec3.((1.0 -. t) *. a + t *. b)
-
 let cast_ray ray world =
   match Hitable.hit world ray 0.0 Float.max_finite_value with
   | Some { normal; _ } ->
@@ -39,7 +36,7 @@ let cast_ray ray world =
   | None ->
       let unit_direction = Vec3.unit ray.Ray.direction in
       let t = unit_direction.Vec3.y +. 1.0 in
-      lerp (Vec3.make 1.0 1.0 1.0) (Vec3.make 0.5 0.7 1.0) t
+      Vec3.lerp (Vec3.make 1.0 1.0 1.0) (Vec3.make 0.5 0.7 1.0) t
 
 let sample_color camera world x y nx ny =
   let open Float.O in
