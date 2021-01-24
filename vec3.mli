@@ -20,5 +20,7 @@ val dot : t -> t -> float
 val cross : t -> t -> t
 val unit : t -> t
 val zero : t
+val one : t
 val lerp : t -> t -> float -> t
 val reflect : t -> t -> t
+val refract : t -> t -> float -> t option

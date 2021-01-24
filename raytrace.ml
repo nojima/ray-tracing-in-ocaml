@@ -45,7 +45,8 @@ let () =
     [ Hitable.Sphere (Vec3.make   0.0      0.0  (-1.0),   0.5, Material.Lambertian (Vec3.make 0.8 0.3 0.3))
     ; Hitable.Sphere (Vec3.make   0.0  (-100.5) (-1.0), 100.0, Material.Lambertian (Vec3.make 0.8 0.8 0.0))
     ; Hitable.Sphere (Vec3.make   1.0      0.0  (-1.0),   0.5, Material.Metal (Vec3.make 0.8 0.6 0.2, 1.0))
-    ; Hitable.Sphere (Vec3.make (-1.0)     0.0  (-1.0),   0.5, Material.Metal (Vec3.make 0.8 0.8 0.8, 0.3))
+    ; Hitable.Sphere (Vec3.make (-1.0)     0.0  (-1.0),   0.5, Material.Dialectric 1.5)
+    ; Hitable.Sphere (Vec3.make (-1.0)     0.0  (-1.0), -0.45, Material.Dialectric 1.5)
     ]
   in
   Ppm.write nx ny (fun x y ->

@@ -79,8 +79,20 @@ let unit v =
 let zero =
   make 0.0 0.0 0.0
 
+let one =
+  make 1.0 1.0 1.0
+
 let lerp a b t =
   (1.0 -. t) *. a + t *. b
 
 let reflect v n =
   v - 2.0 *. (dot v n *. n)
+
+let refract v n ni_over_nt =
+  let uv = unit v in
+  let dt = dot uv n in
+  let discriminant = Float.O.(1.0 - ni_over_nt*ni_over_nt*(1.0 - dt*dt)) in
+  if Float.O.(discriminant > 0.0) then
+    Some (ni_over_nt *. (uv - dt *. n) - Float.sqrt discriminant *. n)
+  else
+    None
