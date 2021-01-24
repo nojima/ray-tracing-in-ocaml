@@ -75,3 +75,6 @@ let cross v w =
 
 let unit v =
   v /. length v
+
+let zero =
+  make 0.0 0.0 0.0

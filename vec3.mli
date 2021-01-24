@@ -19,3 +19,4 @@ val squared_length : t -> float
 val dot : t -> t -> float
 val cross : t -> t -> t
 val unit : t -> t
+val zero : t
