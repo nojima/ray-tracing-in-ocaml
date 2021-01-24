@@ -44,16 +44,13 @@ let color_of ray world =
       lerp (Vec3.make 1.0 1.0 1.0) (Vec3.make 0.5 0.7 1.0) t
 
 let () =
-  let origin            = Vec3.make   0.0    0.0    0.0  in
-  let lower_left_corner = Vec3.make (-2.0) (-1.0) (-1.0) in
-  let horizontal        = Vec3.make   4.0    0.0    0.0  in
-  let vertical          = Vec3.make   0.0    2.0    0.0  in
+  let camera = Camera.make () in
   let world = Hitable.Collection
     [ Hitable.Sphere (Vec3.make 0.0     0.0  (-1.0),   0.5)
     ; Hitable.Sphere (Vec3.make 0.0 (-100.5) (-1.0), 100.0)
     ]
   in
   PPM.write 200 100 (fun u v ->
-    let ray = Ray.make origin Vec3.(lower_left_corner + u*.horizontal + v*.vertical) in
+    let ray = Camera.get_ray camera u v in
     color_of ray world
   )
