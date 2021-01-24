@@ -34,26 +34,10 @@ end
 let lerp a b t =
   Vec3.((1.0 -. t) *. a + t *. b)
 
-let hit_sphere center radius ray =
-  let open Ray in
-  let open Vec3 in
-  let oc = ray.origin - center in
-  let a = dot ray.direction ray.direction in
-  let open Float.O in
-  let b = 2.0 * dot oc ray.direction in
-  let c = dot oc oc - radius*radius in
-  let discriminant = b*b - 4.0*a*c in
-  if discriminant < 0.0 then
-    None
-  else
-    let t = (-b - Float.sqrt discriminant) / (2.0*a) in
-    Some (point_at_parameter ray t)
-
-let color_of ray =
-  match hit_sphere (Vec3.make 0.0 0.0 (-1.0)) 0.5 ray with
-  | Some p ->
-      let n = Vec3.(unit (p - make 0.0 0.0 (-1.0))) in
-      Vec3.(0.5 *. (n + make 1.0 1.0 1.0))
+let color_of ray world =
+  match Hitable.hit world ray 0.0 Float.max_finite_value with
+  | Some { normal; _ } ->
+      Vec3.(0.5 *. (normal + make 1.0 1.0 1.0))
   | None ->
       let unit_direction = Vec3.unit ray.Ray.direction in
       let t = unit_direction.Vec3.y +. 1.0 in
@@ -64,7 +48,12 @@ let () =
   let lower_left_corner = Vec3.make (-2.0) (-1.0) (-1.0) in
   let horizontal        = Vec3.make   4.0    0.0    0.0  in
   let vertical          = Vec3.make   0.0    2.0    0.0  in
+  let world = Hitable.Collection
+    [ Hitable.Sphere (Vec3.make 0.0     0.0  (-1.0),   0.5)
+    ; Hitable.Sphere (Vec3.make 0.0 (-100.5) (-1.0), 100.0)
+    ]
+  in
   PPM.write 200 100 (fun u v ->
     let ray = Ray.make origin Vec3.(lower_left_corner + u*.horizontal + v*.vertical) in
-    color_of ray
+    color_of ray world
   )

@@ -2,7 +2,7 @@ open Base
 
 type t =
   | Sphere of Vec3.t * float
-  | Collection of t List.t
+  | Collection of t list
 
 type record =
   { t : float
