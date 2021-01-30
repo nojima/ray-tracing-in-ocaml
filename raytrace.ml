@@ -40,25 +40,10 @@ let gamma_correction c =
   Vec3.(make (Float.sqrt c.x) (Float.sqrt c.y) (Float.sqrt c.z))
 
 let () =
-  let (nx, ny) = (200, 100) in
-  let n_samples = 100 in
-  let camera = Camera.make
-    ~look_from:  (Vec3.make (-2.0) 2.0   1.0)
-    ~look_at:    (Vec3.make   0.0  0.0 (-1.0))
-    ~v_up:       (Vec3.make   0.0  1.0   0.0)
-    ~vfov:       30.0
-    ~aspect:     (Float.of_int nx /. Float.of_int ny)
-    ~aperture:   2.0
-    ~focus_dist: (Float.sqrt 12.0)
-  in
-  let world = Hitable.Collection
-    [ Hitable.Sphere (Vec3.make   0.0      0.0  (-1.0),   0.5, Material.Lambertian (Vec3.make 0.8 0.3 0.3))
-    ; Hitable.Sphere (Vec3.make   0.0  (-100.5) (-1.0), 100.0, Material.Lambertian (Vec3.make 0.8 0.8 0.0))
-    ; Hitable.Sphere (Vec3.make   1.0      0.0  (-1.0),   0.5, Material.Metal (Vec3.make 0.8 0.6 0.2, 1.0))
-    ; Hitable.Sphere (Vec3.make (-1.0)     0.0  (-1.0),   0.5, Material.Dialectric 1.5)
-    ; Hitable.Sphere (Vec3.make (-1.0)     0.0  (-1.0), -0.45, Material.Dialectric 1.5)
-    ]
-  in
+  let (nx, ny) = (400, 225) in
+  let n_samples = 300 in
+  let camera = Scene.setup_camera nx ny in
+  let world = Scene.setup_world () in
   Ppm.write nx ny (fun x y ->
     sample_colors camera world x y nx ny n_samples
     |> gamma_correction
