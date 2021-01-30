@@ -42,7 +42,13 @@ let gamma_correction c =
 let () =
   let (nx, ny) = (200, 100) in
   let n_samples = 100 in
-  let camera = Camera.make () in
+  let camera = Camera.make
+    ~look_from:(Vec3.make (-2.0) 2.0   1.0)
+    ~look_at:  (Vec3.make   0.0  0.0 (-1.0))
+    ~v_up:     (Vec3.make   0.0  1.0   0.0)
+    ~vfov:     30.0
+    ~aspect:   (Float.of_int nx /. Float.of_int ny)
+  in
   let world = Hitable.Collection
     [ Hitable.Sphere (Vec3.make   0.0      0.0  (-1.0),   0.5, Material.Lambertian (Vec3.make 0.8 0.3 0.3))
     ; Hitable.Sphere (Vec3.make   0.0  (-100.5) (-1.0), 100.0, Material.Lambertian (Vec3.make 0.8 0.8 0.0))
